@@ -58,6 +58,8 @@ type Channel struct {
 	Language         *string      `xml:"language"`
 	Link             *string      `xml:"link"`
 	Title            *string      `xml:"title"`
+	PubDate          *Date        `xml:"pubDate"`
+	LastBuildDate    *Date        `xml:"lastBuildDate"`
 	AtomLink         *AtomLink    `xml:"atom:link"`
 	ContentEncoded   *ContentEncoded
 	ITunesAuthor     *string `xml:"itunes:author"`
