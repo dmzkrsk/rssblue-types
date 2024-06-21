@@ -54,67 +54,73 @@ func (isPresent *NSBool) MarshalXMLAttr(name xml.Name) (xml.Attr, error) {
 
 // Channel represents the podcast's feed.
 type Channel struct {
-	XMLName          xml.Name     `xml:"channel"`
-	Copyright        *string      `xml:"copyright"`
-	Description      *Description `xml:"description"`
-	Generator        *string      `xml:"generator"`
-	Docs             *string      `xml:"docs"`
-	Language         *string      `xml:"language"`
-	Link             *string      `xml:"link"`
-	Title            *string      `xml:"title"`
-	PubDate          *Date        `xml:"pubDate"`
-	LastBuildDate    *Date        `xml:"lastBuildDate"`
-	AtomLink         *AtomLink    `xml:"atom:link"`
-	ContentEncoded   *ContentEncoded
-	ITunesAuthor     *string `xml:"itunes:author"`
-	ITunesCategories []ITunesCategory
-	ITunesExplicit   *bool `xml:"itunes:explicit"`
-	ITunesImage      *ITunesImage
-	ITunesNewFeedURL *string `xml:"itunes:new-feed-url"`
-	ITunesOwner      *ITunesOwner
-	ITunesType       *string `xml:"itunes:type"`
-	PodcastFundings  []PodcastFunding
-	PodcastGUID      *PodcastGUID `xml:"podcast:guid"`
-	PodcastLocation  *PodcastLocation
-	PodcastLocked    *PodcastLocked
-	PodcastMedium    *PodcastMedium `xml:"podcast:medium"`
-	PodcastPersons   []PodcastPerson
-	PodcastPodping   *PodcastPodping
-	PodcastTXTs      []PodcastTXT
-	PodcastTrailers  []PodcastTrailer
-	PodcastValue     *PodcastValue
-	Items            []Item
+	XMLName            xml.Name     `xml:"channel"`
+	Copyright          *string      `xml:"copyright"`
+	Description        *Description `xml:"description"`
+	Generator          *string      `xml:"generator"`
+	Docs               *string      `xml:"docs"`
+	Language           *string      `xml:"language"`
+	LastBuildDate      *Date        `xml:"lastBuildDate"`
+	Link               *string      `xml:"link"`
+	Title              *string      `xml:"title"`
+	PubDate            *Date        `xml:"pubDate"`
+	AtomLink           *AtomLink    `xml:"atom:link"`
+	ContentEncoded     *ContentEncoded
+	ITunesAuthor       *string `xml:"itunes:author"`
+	ITunesCategories   []ITunesCategory
+	ITunesExplicit     *bool `xml:"itunes:explicit"`
+	ITunesImage        *ITunesImage
+	ITunesNewFeedURL   *string `xml:"itunes:new-feed-url"`
+	ITunesOwner        *ITunesOwner
+	ITunesType         *string `xml:"itunes:type"`
+	PodcastFundings    []PodcastFunding
+	PodcastGUID        *PodcastGUID `xml:"podcast:guid"`
+	PodcastLocation    *PodcastLocation
+	PodcastLocked      *PodcastLocked
+	PodcastMedium      *PodcastMedium `xml:"podcast:medium"`
+	PodcastPersons     []PodcastPerson
+	PodcastPodping     *PodcastPodping
+	PodcastPublisher   *PodcastPublisher
+	PodcastRemoteItems []PodcastRemoteItem
+	PodcastSingleItem  *PodcastSingleItem
+	PodcastTXTs        []PodcastTXT
+	PodcastTrailers    []PodcastTrailer
+	PodcastValue       *PodcastValue
+	PodcastLiveItems   []PodcastLiveItem
+	Items              []Item
 }
 
 // Item represents episode of a podcast.
 type Item struct {
-	XMLName             xml.Name     `xml:"item"`
-	Description         *Description `xml:"description"`
-	Enclosure           *Enclosure
-	GUID                *GUID
-	Link                *string `xml:"link"`
-	PubDate             *Date   `xml:"pubDate"`
-	Title               *string `xml:"title"`
-	Comments            *string `xml:"comments"`
-	DCCreator           *string `xml:"dc:creator"`
-	DCAuthor            *string `xml:"dc:author"`
-	ContentEncoded      *ContentEncoded
-	ITunesDuration      *int64  `xml:"itunes:duration"`
-	ITunesEpisodeNumber *int64  `xml:"itunes:episode"`
-	ITunesEpisodeType   *string `xml:"itunes:episodeType"`
-	ITunesExplicit      *bool   `xml:"itunes:explicit"`
-	ITunesImage         *ITunesImage
-	ITunesSeasonNumber  *int64 `xml:"itunes:season"`
-	PodcastChapters     *PodcastChapters
-	PodcastEpisode      *PodcastEpisode
-	PodcastLocation     *PodcastLocation
-	PodcastPersons      []PodcastPerson
-	PodcastSeason       *PodcastSeason
-	PodcastSoundbites   []PodcastSoundbite
-	PodcastTXTs         []PodcastTXT
-	PodcastTranscripts  []PodcastTranscript
-	PodcastValue        *PodcastValue
-	PSCChapters         *PSCChapters
+	XMLName                    xml.Name     `xml:"item"`
+	Description                *Description `xml:"description"`
+	Enclosure                  *Enclosure
+	GUID                       *GUID
+	Link                       *string `xml:"link"`
+	PubDate                    *Date   `xml:"pubDate"`
+	Title                      *string `xml:"title"`
+	Comments                   *string `xml:"comments"`
+	DCCreator                  *string `xml:"dc:creator"`
+	DCAuthor                   *string `xml:"dc:author"`
+	ContentEncoded             *ContentEncoded
+	ITunesDuration             *int64  `xml:"itunes:duration"`
+	ITunesEpisodeNumber        *int64  `xml:"itunes:episode"`
+	ITunesEpisodeType          *string `xml:"itunes:episodeType"`
+	ITunesExplicit             *bool   `xml:"itunes:explicit"`
+	ITunesImage                *ITunesImage
+	ITunesSeasonNumber         *int64 `xml:"itunes:season"`
+	PodcastAlternateEnclosures []PodcastAlternateEnclosure
+	PodcastChapters            *PodcastChapters
+	PodcastEpisode             *PodcastEpisode
+	PodcastISRC                *PodcastISRC
+	PodcastLocation            *PodcastLocation
+	PodcastPersons             []PodcastPerson
+	PodcastSeason              *PodcastSeason
+	PodcastSoundbites          []PodcastSoundbite
+	PodcastTXTs                []PodcastTXT
+	PodcastTranscripts         []PodcastTranscript
+	PodcastValue               *PodcastValue
+	PSCChapters                *PSCChapters
 }
 
 // Date is used to format the publish date of an episode.

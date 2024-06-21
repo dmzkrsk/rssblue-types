@@ -3,9 +3,12 @@ package types
 import (
 	"encoding/xml"
 	"fmt"
+	"math"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 // NamespacePodcast is the Podcasting 2.0 namespace.
@@ -36,11 +39,12 @@ type PodcastChapters struct {
 // PodcastValue enables to describe Value 4 Value payments. Read more at
 // https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/1.0.md#value
 type PodcastValue struct {
-	XMLName    xml.Name `xml:"podcast:value"`
-	Type       string   `xml:"type,attr"`
-	Method     string   `xml:"method,attr"`
-	Suggested  *float64 `xml:"suggested,attr,omitempty"`
-	Recipients []PodcastValueRecipient
+	XMLName         xml.Name `xml:"podcast:value"`
+	Type            string   `xml:"type,attr"`
+	Method          string   `xml:"method,attr"`
+	Suggested       *float64 `xml:"suggested,attr,omitempty"`
+	Recipients      []PodcastValueRecipient
+	ValueTimeSplits []PodcastValueTimeSplit
 }
 
 // PodcastValueRecipient describes the recipient of Value 4 Value payments.
@@ -55,6 +59,30 @@ type PodcastValueRecipient struct {
 	Address     string   `xml:"address,attr"`
 	Split       uint     `xml:"split,attr"`
 	Fee         *bool    `xml:"bool,attr"`
+}
+
+// PodcastValueTimeSplit describes value splits that are valid for a certain period of time
+// Read more at
+// https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/1.0.md#value-time-split
+type PodcastValueTimeSplit struct {
+	XMLName          xml.Name         `xml:"podcast:valueTimeSplit"`
+	StartTime        DurationInteger  `xml:"startTime,attr"`
+	Duration         DurationInteger  `xml:"duration,attr"`
+	RemoteStartTime  *DurationInteger `xml:"remoteStartTime,attr,omitempty"`
+	RemotePercentage *uint            `xml:"remotePercentage,attr,omitempty"`
+	Recipients       []PodcastValueRecipient
+	RemoteItem       PodcastRemoteItem
+}
+
+// PodcastRemoteItem provides a way to "point" to another feed or item in it.
+// Read more at
+// https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/1.0.md#remote-item
+type PodcastRemoteItem struct {
+	XMLName  xml.Name       `xml:"podcast:remoteItem"`
+	ItemGUID *string        `xml:"itemGuid,attr"`
+	FeedGUID uuid.UUID      `xml:"feedGuid,attr"`
+	FeedURL  *string        `xml:"feedUrl,attr"`
+	Medium   *PodcastMedium `xml:"medium,attr"`
 }
 
 // PodcastLocked tells podcast hosting platforms whether they are allowed to import
@@ -170,6 +198,17 @@ func (duration Duration) MarshalXMLAttr(name xml.Name) (xml.Attr, error) {
 	return xml.Attr{Name: xml.Name{Local: name.Local}, Value: s}, nil
 }
 
+// DurationInteger denotes timestamps and durations during a podcast episode, but which are converted to integer seconds.
+type DurationInteger time.Duration
+
+func (duration DurationInteger) MarshalXMLAttr(name xml.Name) (xml.Attr, error) {
+	seconds := time.Duration(duration).Seconds()
+	seconds = math.Round(seconds)
+	s := strconv.Itoa(int(seconds))
+
+	return xml.Attr{Name: xml.Name{Local: name.Local}, Value: s}, nil
+}
+
 // PodcastPerson specifies a person of interest to the podcast. Read more at
 // https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/1.0.md#person
 type PodcastPerson struct {
@@ -226,6 +265,18 @@ var (
 	PodcastMediumAudioBook  PodcastMedium = "audiobook"
 	PodcastMediumNewsletter PodcastMedium = "newsletter"
 	PodcastMediumBlog       PodcastMedium = "blog"
+
+	PodcastMediumPublisher PodcastMedium = "publisher"
+
+	PodcastMediumPodcastList    PodcastMedium = "podcastL"
+	PodcastMediumMusicList      PodcastMedium = "musicL"
+	PodcastMediumVideoList      PodcastMedium = "videoL"
+	PodcastMediumFilmList       PodcastMedium = "filmL"
+	PodcastMediumAudioBookList  PodcastMedium = "audiobookL"
+	PodcastMediumNewsletterList PodcastMedium = "newsletterL"
+	PodcastMediumBlogList       PodcastMedium = "blogL"
+	PodcastMediumPublisherList  PodcastMedium = "publisherL"
+	PodcastMediumMixedList      PodcastMedium = "mixed"
 )
 
 // PodcastTXT is intended for free-form text and is modeled after the DNS "TXT"
@@ -237,10 +288,121 @@ type PodcastTXT struct {
 	Purpose *string  `xml:"purpose,attr"`
 }
 
+// PodcastISRC is an experimental tag to store International Standard Recording
+// Codes. Read more at https://isrc.ifpi.org
+type PodcastISRC struct {
+	XMLName xml.Name `xml:"podcast:isrc"`
+	ISRC    string   `xml:",chardata"`
+}
+
 // PodcastPodping allows feed owners to signal to aggregators that the feed sends out Podping notifications when changes are made to it.
 // Read more at
 // https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/1.0.md#podping
 type PodcastPodping struct {
 	XMLName     xml.Name `xml:"podcast:podping"`
 	UsesPodping *bool    `xml:"usesPodping,attr"`
+}
+
+// PodcastPublisher allows a podcast feed to link to it's "publisher feed" parent.
+// Read more at
+// https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/1.0.md#publisher
+type PodcastPublisher struct {
+	XMLName     xml.Name `xml:"podcast:publisher"`
+	RemoteItems []PodcastRemoteItem
+}
+
+// PodcastAlternateEnclosure provides different versions of, or companion media to the main `<enclosure>` file.
+// Read more at
+// https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/1.0.md#alternate-enclosure
+type PodcastAlternateEnclosure struct {
+	XMLName      xml.Name `xml:"podcast:alternateEnclosure"`
+	Mimetype     string   `xml:"type,attr"`
+	Length       *int64   `xml:"length,attr"`
+	Bitrate      *int64   `xml:"bitrate,attr"`
+	Height       *int64   `xml:"height,attr"`
+	LanguageCode *string  `xml:"lang,attr"`
+	Title        *string  `xml:"title,attr"`
+	Rel          *string  `xml:"rel,attr"`
+	Default      *bool    `xml:"default,attr"`
+	Sources      []PodcastSource
+}
+
+// PodcastSource defines a uri location for a `<podcast:alternateEnclosure>` media file.
+// Read more at
+// https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/1.0.md#source
+type PodcastSource struct {
+	XMLName     xml.Name `xml:"podcast:source"`
+	URI         string   `xml:"uri,attr"`
+	ContentType *string  `xml:"contentType,attr"`
+}
+
+type PodcastContentLink struct {
+	XMLName xml.Name `xml:"podcast:contentLink"`
+	Href    string   `xml:"href,attr"`
+	Text    string   `xml:",chardata"`
+}
+
+type PodcastLiveStatus string
+
+var (
+	PodcastLiveStatusPending PodcastLiveStatus = "pending"
+	PodcastLiveStatusLive    PodcastLiveStatus = "live"
+	PodcastLiveStatusEnded   PodcastLiveStatus = "ended"
+)
+
+type PodcastLiveItem struct {
+	XMLName xml.Name `xml:"podcast:liveItem"`
+
+	Status    PodcastLiveStatus `xml:"status,attr"`
+	StartTime time.Time         `xml:"start,attr"`
+	EndTime   *time.Time        `xml:"end,attr,omitempty"`
+
+	Description                *Description `xml:"description"`
+	Enclosure                  *Enclosure
+	GUID                       *GUID
+	Link                       *string `xml:"link"`
+	Title                      *string `xml:"title"`
+	ContentEncoded             *ContentEncoded
+	ITunesEpisodeNumber        *int64  `xml:"itunes:episode"`
+	ITunesEpisodeType          *string `xml:"itunes:episodeType"`
+	ITunesExplicit             *bool   `xml:"itunes:explicit"`
+	ITunesImage                *ITunesImage
+	ITunesSeasonNumber         *int64 `xml:"itunes:season"`
+	PodcastAlternateEnclosures []PodcastAlternateEnclosure
+	PodcastChat                *PodcastChat
+	PodcastContentLinks        []PodcastContentLink
+	PodcastEpisode             *PodcastEpisode
+	PodcastISRC                *PodcastISRC
+	PodcastLiveValue           *PodcastLiveValue
+	PodcastLocation            *PodcastLocation
+	PodcastPersons             []PodcastPerson
+	PodcastSeason              *PodcastSeason
+	PodcastSoundbites          []PodcastSoundbite
+	PodcastTXTs                []PodcastTXT
+	PodcastTranscripts         []PodcastTranscript
+	PodcastValue               *PodcastValue
+}
+
+// PodcastLiveValue is an experimental tag to transmit updates during a livestream.
+type PodcastLiveValue struct {
+	XMLName  xml.Name `xml:"podcast:liveValue"`
+	URI      string   `xml:"uri,attr"`
+	Protocol string   `xml:"protocol,attr"`
+}
+
+// PodcastChat is an experimental tag to enable chat during a livestream.
+type PodcastChat struct {
+	XMLName   xml.Name `xml:"podcast:chat"`
+	Server    string   `xml:"server,attr"`
+	Protocol  string   `xml:"protocol,attr"`
+	AccountID *string  `xml:"accountId,attr"`
+	Space     *string  `xml:"space,attr"`
+	EmbedURL  *string  `xml:"embedUrl,attr"`
+}
+
+// PodcastSingleItem denotes whether the feed contains a single item or multiple items.
+// It's a proposal described at https://github.com/Podcastindex-org/podcast-namespace/discussions/578
+type PodcastSingleItem struct {
+	XMLName xml.Name `xml:"podcast:singleItem"`
+	Value   bool     `xml:",chardata"`
 }

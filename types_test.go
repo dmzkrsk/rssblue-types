@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/google/uuid"
 	"github.com/rssblue/types"
 )
 
@@ -33,7 +34,9 @@ func TestMarshal(t *testing.T) {
 						Encoded: "<strong>Description</strong>",
 						IsCDATA: true,
 					},
-					Generator: pointer("RSS Blue v1.0.0"),
+					Generator:     pointer("RSS Blue v1.0.0"),
+					LastBuildDate: pointer(types.Date(time.Date(2023, time.October, 31, 11, 0, 0, 0, time.UTC))),
+
 					ITunesImage: &types.ITunesImage{
 						URL: "https://rssblue.com/@bookworm-podcast/cover-art.png",
 					},
@@ -68,6 +71,18 @@ func TestMarshal(t *testing.T) {
 							Caption: "Support “Bookworm Podcast”",
 						},
 					},
+					PodcastPublisher: &types.PodcastPublisher{
+						RemoteItems: []types.PodcastRemoteItem{
+							{
+								FeedGUID: uuid.MustParse("003af0a0-6a45-55cf-b765-68e3d349551a"),
+								FeedURL:  pointer("https://agilesetmedia.com/assets/static/feeds/publisher.xml"),
+								Medium:   pointer(types.PodcastMediumPublisher),
+							},
+						},
+					},
+					PodcastSingleItem: &types.PodcastSingleItem{
+						Value: false,
+					},
 					PodcastValue: &types.PodcastValue{
 						Type:   "lightning",
 						Method: "keysend",
@@ -89,6 +104,30 @@ func TestMarshal(t *testing.T) {
 								Type:    "node",
 								Address: "03ae9f91a0cb8ff43840e3c322c4c61f019d8c1c3cea15a25cfc425ac605e61a4a",
 								Split:   10,
+							},
+						},
+						ValueTimeSplits: []types.PodcastValueTimeSplit{
+							{
+								StartTime: types.DurationInteger(60 * time.Second),
+								Duration:  types.DurationInteger(237 * time.Second),
+								RemoteItem: types.PodcastRemoteItem{
+									ItemGUID: pointer("https://podcastindex.org/podcast/4148683#1"),
+									FeedGUID: uuid.MustParse("a94f5cc9-8c58-55fc-91fe-a324087a655b"),
+									FeedURL:  pointer("https://feeds.podcastindex.org/Album-TourconVII.xml"),
+									Medium:   pointer(types.PodcastMediumMusic),
+								},
+								RemotePercentage: pointer[uint](95),
+							},
+							{
+								StartTime: types.DurationInteger(330 * time.Second),
+								Duration:  types.DurationInteger(53 * time.Second),
+								RemoteItem: types.PodcastRemoteItem{
+									ItemGUID: pointer("https://podcastindex.org/podcast/4148683#3"),
+									FeedGUID: uuid.MustParse("a94f5cc9-8c58-55fc-91fe-a324087a655b"),
+									Medium:   pointer(types.PodcastMediumMusic),
+								},
+								RemoteStartTime:  pointer(types.DurationInteger(174 * time.Second)),
+								RemotePercentage: pointer[uint](95),
 							},
 						},
 					},
@@ -130,6 +169,28 @@ func TestMarshal(t *testing.T) {
 					PodcastPodping: &types.PodcastPodping{
 						UsesPodping: pointer(true),
 					},
+					PodcastLiveItems: []types.PodcastLiveItem{
+						{
+							Status:    types.PodcastLiveStatusLive,
+							StartTime: time.Date(2021, time.September, 9, 26, 7, 30, 0, time.UTC),
+							EndTime:   pointer(time.Date(2021, time.September, 9, 26, 9, 30, 0, time.UTC)),
+							Title:     pointer("Podcasting 2.0 Live Stream"),
+							GUID: &types.GUID{
+								GUID: "e32b4890-983b-4ce5-8b46-f2d6bc1d8819",
+							},
+							Enclosure: &types.Enclosure{
+								URL:      "https://example.com/pc20/livestream?format=.mp3",
+								Mimetype: "audio/mpeg",
+								Length:   312,
+							},
+							PodcastContentLinks: []types.PodcastContentLink{
+								{
+									Href: "https://example.com/html/livestream",
+									Text: "Listen Live!",
+								},
+							},
+						},
+					},
 					Items: []types.Item{
 						{
 							Title: pointer("Simple Episode"),
@@ -151,6 +212,7 @@ func TestMarshal(t *testing.T) {
 								IsCDATA: false,
 							},
 							ITunesEpisodeType: pointer("full"),
+							ITunesDuration:    pointer(types.ITunesDuration(10 * time.Minute)),
 							PSCChapters: &types.PSCChapters{
 								Version: "1.2",
 								Chapters: []types.PSCChapter{
@@ -189,6 +251,19 @@ func TestMarshal(t *testing.T) {
 								Mimetype: "audio/mpeg",
 								Length:   2048,
 							},
+							PodcastAlternateEnclosures: []types.PodcastAlternateEnclosure{
+								{
+									Mimetype: "video/mp4",
+									Length:   pointer[int64](7924786),
+									Bitrate:  pointer[int64](511276),
+									Height:   pointer[int64](720),
+									Sources: []types.PodcastSource{
+										{
+											URI: "https://example.com/file-720.mp4",
+										},
+									},
+								},
+							},
 							GUID: &types.GUID{
 								GUID:        "hello-again",
 								IsPermaLink: pointer(false),
@@ -205,6 +280,7 @@ func TestMarshal(t *testing.T) {
 									Mimetype: "text/vtt",
 								},
 							},
+							ITunesDuration: pointer(types.ITunesDuration(10*time.Minute + 70*time.Second + 1900*time.Millisecond)),
 							PodcastValue: &types.PodcastValue{
 								Type:   "lightning",
 								Method: "keysend",
@@ -282,6 +358,9 @@ func TestMarshal(t *testing.T) {
 							GUID: &types.GUID{
 								GUID: "https://rssblue.com/@bookworm-podcast/hello-world",
 							},
+							PodcastISRC: &types.PodcastISRC{
+								ISRC: "AA6Q72000047",
+							},
 							PubDate: pointer(types.Date(time.Date(2021, time.July, 8, 15, 20, 10, 0, time.UTC))),
 							Description: &types.Description{
 								Description: "This is my <em>first</em> episode!",
@@ -344,6 +423,7 @@ func TestMarshal(t *testing.T) {
     <description><![CDATA[<strong>Description</strong>]]></description>
     <generator>RSS Blue v1.0.0</generator>
     <language>en</language>
+    <lastBuildDate>Tue, 31 Oct 2023 11:00:00 GMT</lastBuildDate>
     <link>https://example.com</link>
     <title>Bookworm Podcast</title>
     <atom:link href="https://example.com/feed.xml" rel="self" type="application/rss+xml"></atom:link>
@@ -365,6 +445,10 @@ func TestMarshal(t *testing.T) {
     <podcast:medium>podcast</podcast:medium>
     <podcast:person href="https://example.com/johnsmith/blog" img="http://example.com/images/johnsmith.jpg">John Smith</podcast:person>
     <podcast:podping usesPodping="true"></podcast:podping>
+    <podcast:publisher>
+      <podcast:remoteItem feedGuid="003af0a0-6a45-55cf-b765-68e3d349551a" feedUrl="https://agilesetmedia.com/assets/static/feeds/publisher.xml" medium="publisher"></podcast:remoteItem>
+    </podcast:publisher>
+    <podcast:singleItem>false</podcast:singleItem>
     <podcast:txt>naj3eEZaWVVY9a38uhX8FekACyhtqP4JN</podcast:txt>
     <podcast:txt purpose="verify">S6lpp-7ZCn8-dZfGc-OoyaG</podcast:txt>
     <podcast:trailer pubdate="Thu, 01 Apr 2021 08:00:00 GMT" url="https://example.org/trailers/teaser" length="12345678" type="audio/mp3">Coming April 1st, 2021</podcast:trailer>
@@ -373,7 +457,19 @@ func TestMarshal(t *testing.T) {
       <podcast:valueRecipient name="Co-Host #1" type="node" address="02d5c1bf8b940dc9cadca86d1b0a3c37fbe39cee4c7e839e33bef9174531d27f52" split="50"></podcast:valueRecipient>
       <podcast:valueRecipient name="Co-Host #2" type="node" address="032f4ffbbafffbe51726ad3c164a3d0d37ec27bc67b29a159b0f49ae8ac21b8508" split="40"></podcast:valueRecipient>
       <podcast:valueRecipient name="Producer" type="node" address="03ae9f91a0cb8ff43840e3c322c4c61f019d8c1c3cea15a25cfc425ac605e61a4a" split="10"></podcast:valueRecipient>
+      <podcast:valueTimeSplit startTime="60" duration="237" remotePercentage="95">
+        <podcast:remoteItem itemGuid="https://podcastindex.org/podcast/4148683#1" feedGuid="a94f5cc9-8c58-55fc-91fe-a324087a655b" feedUrl="https://feeds.podcastindex.org/Album-TourconVII.xml" medium="music"></podcast:remoteItem>
+      </podcast:valueTimeSplit>
+      <podcast:valueTimeSplit startTime="330" duration="53" remoteStartTime="174" remotePercentage="95">
+        <podcast:remoteItem itemGuid="https://podcastindex.org/podcast/4148683#3" feedGuid="a94f5cc9-8c58-55fc-91fe-a324087a655b" medium="music"></podcast:remoteItem>
+      </podcast:valueTimeSplit>
     </podcast:value>
+    <podcast:liveItem status="live" start="2021-09-10T02:07:30Z" end="2021-09-10T02:09:30Z">
+      <enclosure url="https://example.com/pc20/livestream?format=.mp3" length="312" type="audio/mpeg"></enclosure>
+      <guid>e32b4890-983b-4ce5-8b46-f2d6bc1d8819</guid>
+      <title>Podcasting 2.0 Live Stream</title>
+      <podcast:contentLink href="https://example.com/html/livestream">Listen Live!</podcast:contentLink>
+    </podcast:liveItem>
     <item>
       <description>This is a simple episode &amp; its description.</description>
       <enclosure url="https://rssblue.com/@bookworm-podcast/simple-episode/simple-episode.mp3" length="1024" type="audio/mpeg"></enclosure>
@@ -381,6 +477,7 @@ func TestMarshal(t *testing.T) {
       <pubDate>Fri, 08 Jul 2022 15:20:10 GMT</pubDate>
       <title>Simple Episode</title>
       <content:encoded>This is a simple episode &amp; its description.</content:encoded>
+      <itunes:duration>600</itunes:duration>
       <itunes:episodeType>full</itunes:episodeType>
       <psc:chapters version="1.2">
         <psc:chapter start="00:00" title="Welcome"></psc:chapter>
@@ -394,9 +491,13 @@ func TestMarshal(t *testing.T) {
       <guid isPermaLink="false">hello-again</guid>
       <pubDate>Sat, 10 Jul 2021 09:03:59 GMT</pubDate>
       <title>Hello Again</title>
+      <itunes:duration>671</itunes:duration>
       <itunes:episodeType>full</itunes:episodeType>
       <itunes:explicit>false</itunes:explicit>
       <itunes:image href="https://rssblue.com/@bookworm-podcast/hello-again/cover-art.png"></itunes:image>
+      <podcast:alternateEnclosure type="video/mp4" length="7924786" bitrate="511276" height="720">
+        <podcast:source uri="https://example.com/file-720.mp4"></podcast:source>
+      </podcast:alternateEnclosure>
       <podcast:episode>3</podcast:episode>
       <podcast:person role="guest" href="https://www.imdb.com/name/nm0427852888/" img="http://example.com/images/janedoe.jpg">Jane Doe</podcast:person>
       <podcast:person role="guest" href="https://www.wikipedia/alicebrown" img="http://example.com/images/alicebrown.jpg">Alice Brown</podcast:person>
@@ -424,6 +525,7 @@ func TestMarshal(t *testing.T) {
       <itunes:explicit>true</itunes:explicit>
       <podcast:chapters url="https://rssblue.com/@bookworm-podcast/hello-world/chapters.json" type="application/json+chapters"></podcast:chapters>
       <podcast:episode display="Ch.3">315.5</podcast:episode>
+      <podcast:isrc>AA6Q72000047</podcast:isrc>
       <podcast:location geo="geo:39.7837304,-100.445882;u=3900000" osm="R148838">Gitmo Nation</podcast:location>
       <podcast:person group="writing" role="guest" href="https://www.wikipedia/alicebrown" img="http://example.com/images/alicebrown.jpg">Alice Brown</podcast:person>
       <podcast:person group="visuals" role="Cover Art Designer" href="https://example.com/artist/beckysmith">Becky Smith</podcast:person>
