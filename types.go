@@ -103,10 +103,10 @@ type Item struct {
 	DCCreator                  *string `xml:"dc:creator"`
 	DCAuthor                   *string `xml:"dc:author"`
 	ContentEncoded             *ContentEncoded
-	ITunesDuration             *int64  `xml:"itunes:duration"`
-	ITunesEpisodeNumber        *int64  `xml:"itunes:episode"`
-	ITunesEpisodeType          *string `xml:"itunes:episodeType"`
-	ITunesExplicit             *bool   `xml:"itunes:explicit"`
+	ITunesDuration             *ITunesDuration `xml:"itunes:duration"`
+	ITunesEpisodeNumber        *int64          `xml:"itunes:episode"`
+	ITunesEpisodeType          *string         `xml:"itunes:episodeType"`
+	ITunesExplicit             *bool           `xml:"itunes:explicit"`
 	ITunesImage                *ITunesImage
 	ITunesSeasonNumber         *int64 `xml:"itunes:season"`
 	PodcastAlternateEnclosures []PodcastAlternateEnclosure
