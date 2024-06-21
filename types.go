@@ -17,6 +17,7 @@ type RSS struct {
 	NamespaceITunes     NSBool     `xml:",attr"`
 	NamespacePodcast    NSBool     `xml:",attr"`
 	NamespacePSC        NSBool     `xml:",attr"`
+	NamespaceDublinCore NSBool     `xml:",attr"`
 	Channel             Channel
 }
 
@@ -44,6 +45,8 @@ func (isPresent *NSBool) MarshalXMLAttr(name xml.Name) (xml.Attr, error) {
 		return xml.Attr{Name: xml.Name{Local: "xmlns:podcast"}, Value: NamespacePodcast}, nil
 	case "NamespacePSC":
 		return xml.Attr{Name: xml.Name{Local: "xmlns:psc"}, Value: NamespacePSC}, nil
+	case "NamespaceDublinCore":
+		return xml.Attr{Name: xml.Name{Local: "xmlns:dc"}, Value: NamespaceDublinCore}, nil
 	default:
 		return xml.Attr{}, fmt.Errorf("unrecognised attribute name \"%s\"", name.Local)
 	}
@@ -55,6 +58,7 @@ type Channel struct {
 	Copyright        *string      `xml:"copyright"`
 	Description      *Description `xml:"description"`
 	Generator        *string      `xml:"generator"`
+	Docs             *string      `xml:"docs"`
 	Language         *string      `xml:"language"`
 	Link             *string      `xml:"link"`
 	Title            *string      `xml:"title"`
@@ -91,6 +95,9 @@ type Item struct {
 	Link                *string `xml:"link"`
 	PubDate             *Date   `xml:"pubDate"`
 	Title               *string `xml:"title"`
+	Comments            *string `xml:"comments"`
+	DCCreator           *string `xml:"dc:creator"`
+	DCAuthor            *string `xml:"dc:author"`
 	ContentEncoded      *ContentEncoded
 	ITunesDuration      *int64  `xml:"itunes:duration"`
 	ITunesEpisodeNumber *int64  `xml:"itunes:episode"`
